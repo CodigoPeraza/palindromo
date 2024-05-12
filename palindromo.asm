@@ -4,39 +4,51 @@ global esPalindromo
 esPalindromo:
     push ebp
     mov ebp, esp
-    mov esi, [ebp + 8]  ; Obtener el puntero a la cadena de caracteres
-    mov edi, esi        ; Apuntar al principio de la cadena
+    mov eax, [ebp + 8]  ; Obtener el número entero
+    mov ebx, eax        ; Copiar el número a ebx para su manipulación
 
-    ; Encontrar el final de la cadena
-    xor ecx, ecx        ; Inicializar contador
-    xor eax, eax        ; Clear EAX
-    cld                 ; Dirección ascendente
-    not ecx             ; ECX = -1
-    mov ebx, ecx        ; Guardar el valor de -1 en EBX
-    repne scasb         ; Buscar el final de la cadena
-    not ecx             ; Invertir el resultado para obtener la longitud de la cadena
-    dec esi             ; Retroceder un byte para apuntar al último carácter
+    mov ecx, 0          ; Inicializar el contador
+    mov edx, 0          ; Inicializar el reverso del número
 
-    ; Mover edi al final de la cadena
-    mov edi, esi
-    add edi, ecx        ; Edi ahora apunta al final de la cadena
+    cmp eax, 0          ; Comprobar si el número es negativo
+    jge check_palindrome_start ; Si no es negativo, continuar
 
-    ; Verificar si es un palíndromo
+    neg eax             ; Negar el número si es negativo
+    jmp check_palindrome_start
+
+check_palindrome_start:
+    mov esi, 10         ; Divisor para obtener los dígitos
+check_palindrome_loop:
+    mov edx, 0          ; Limpiar edx para la división
+    div esi             ; Dividir eax por 10, resultado en eax, residuo en edx
+    add ecx, 1          ; Incrementar el contador de dígitos
+    cmp eax, 0          ; Comprobar si eax es cero
+    jz check_palindrome_end ; Si es cero, terminar el bucle
+    jmp check_palindrome_loop ; Continuar el bucle
+
+check_palindrome_end:
+    mov esi, 10         ; Restaurar esi al divisor original
+
 check_palindrome:
-    cmp esi, edi        ; Si hemos llegado al centro
-    jae es_palindrome   ; Si es un palíndromo
+    cmp ecx, 1          ; Comprobar si solo hay un dígito
+    jle es_palindrome   ; Si solo hay un dígito, es un palíndromo
 
-    ; Comparar caracteres simétricos
-    mov al, [esi]
-    mov ah, [edi]
-    cmp al, ah
-    jne not_palindrome  ; No es un palíndromo
+    mov eax, ebx        ; Restaurar el número original a eax
+    mov ecx, 0          ; Reinicializar el contador
 
-    ; Incrementar esi y decrementar edi al mismo tiempo
-    inc esi
-    dec edi
+reverse_loop:
+    mov edx, 0          ; Limpiar edx para la división
+    div esi             ; Dividir eax por 10, resultado en eax, residuo en edx
+    imul ecx, esi      ; Multiplicar el reverso por 10
+    add ecx, edx        ; Agregar el último dígito al reverso
+    cmp eax, 0          ; Comprobar si eax es cero
+    jz check_reverse_palindrome_end ; Si es cero, terminar el bucle
+    jmp reverse_loop    ; Continuar el bucle
 
-    jmp check_palindrome
+check_reverse_palindrome_end:
+    cmp ebx, ecx        ; Comparar el número original con su reverso
+    je es_palindrome    ; Si son iguales, es un palíndromo
+    jmp not_palindrome  ; Si no son iguales, no es un palíndromo
 
 not_palindrome:
     mov eax, 0          ; No es un palíndromo
