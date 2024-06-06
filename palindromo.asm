@@ -7,56 +7,50 @@ esPalindromo:
     mov eax, [ebp + 8]  ; Obtener el número entero
     mov ebx, eax        ; Copiar el número a ebx para su manipulación
 
-    mov ecx, 0          ; Inicializar el contador
+    mov ecx, 0          ; Inicializar el contador de dígitos
     mov edx, 0          ; Inicializar el reverso del número
 
-    cmp eax, 0          ; Comprobar si el número es negativo
-    jge check_palindrome_start ; Si no es negativo, continuar
-
-    neg eax             ; Negar el número si es negativo
-    jmp check_palindrome_start
-
-check_palindrome_start:
+inicio_verificacion_palindromo:
     mov esi, 10         ; Divisor para obtener los dígitos
-check_palindrome_loop:
+bucle_verificacion_palindromo:
     mov edx, 0          ; Limpiar edx para la división
     div esi             ; Dividir eax por 10, resultado en eax, residuo en edx
     add ecx, 1          ; Incrementar el contador de dígitos
     cmp eax, 0          ; Comprobar si eax es cero
-    jz check_palindrome_end ; Si es cero, terminar el bucle
-    jmp check_palindrome_loop ; Continuar el bucle
+    jz fin_verificacion_palindromo ; Si es cero, terminar el bucle
+    jmp bucle_verificacion_palindromo ; Continuar el bucle
 
-check_palindrome_end:
+fin_verificacion_palindromo:
     mov esi, 10         ; Restaurar esi al divisor original
 
-check_palindrome:
+comprobar_palindromo:
     cmp ecx, 1          ; Comprobar si solo hay un dígito
-    jle es_palindrome   ; Si solo hay un dígito, es un palíndromo
+    jle es_palindromo   ; Si solo hay un dígito, es un palíndromo
 
     mov eax, ebx        ; Restaurar el número original a eax
     mov ecx, 0          ; Reinicializar el contador
 
-reverse_loop:
+bucle_reverso:
     mov edx, 0          ; Limpiar edx para la división
     div esi             ; Dividir eax por 10, resultado en eax, residuo en edx
-    imul ecx, esi      ; Multiplicar el reverso por 10
+    imul ecx, esi       ; Multiplicar el reverso por 10
     add ecx, edx        ; Agregar el último dígito al reverso
     cmp eax, 0          ; Comprobar si eax es cero
-    jz check_reverse_palindrome_end ; Si es cero, terminar el bucle
-    jmp reverse_loop    ; Continuar el bucle
+    jz fin_comprobar_reverso_palindromo ; Si es cero, terminar el bucle
+    jmp bucle_reverso   ; Continuar el bucle
 
-check_reverse_palindrome_end:
+fin_comprobar_reverso_palindromo:
     cmp ebx, ecx        ; Comparar el número original con su reverso
-    je es_palindrome    ; Si son iguales, es un palíndromo
-    jmp not_palindrome  ; Si no son iguales, no es un palíndromo
+    je es_palindromo    ; Si son iguales, es un palíndromo
+    jmp no_palindromo   ; Si no son iguales, no es un palíndromo
 
-not_palindrome:
+no_palindromo:
     mov eax, 0          ; No es un palíndromo
-    jmp end_palindrome
+    jmp fin_palindromo
 
-es_palindrome:
+es_palindromo:
     mov eax, 1          ; Es un palíndromo
 
-end_palindrome:
+fin_palindromo:
     pop ebp
     ret
